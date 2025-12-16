@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Mobile Chaos Suite">
+    <test name="Accessibility Tests">
+        <classes>
+            <class name="com.mon.tests.AccessibilityTests"/>
+        </classes>
+    </test>
+    <test name="Chaos Checkout Tests">
+        <classes>
+            <class name="com.mon.tests.ChaosCheckoutTests"/>
+        </classes>
+    </test>
+    <test name="Sanity">
+        <classes>
+            <class name="com.mon.tests.SanityTest"/>
+        </classes>
+    </test>
+    <test name="Login">
+    <classes>
+        <class name="com.mon.tests.LoginTests"/>
+    </classes>
+</test>
+</suite>
