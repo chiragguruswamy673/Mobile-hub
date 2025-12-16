@@ -23,8 +23,19 @@ jobs:
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install dependencies
-        run: mvn install -DskipTests
+      - name: Create and start emulator
+        run: |
+          sdkmanager "system-images;android-30;google_apis;x86_64"
+          echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+          $ANDROID_HOME/emulator/emulator -avd test -no-snapshot -noaudio -no-window &
+          adb wait-for-device
+          adb shell input keyevent 82
 
-      - name: Run TestNG suite
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Start Appium server
+        run: appium --session-override &
+
+      - name: Build and run tests
         run: mvn test
