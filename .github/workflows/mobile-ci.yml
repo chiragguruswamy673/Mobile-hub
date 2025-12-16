@@ -48,10 +48,12 @@ jobs:
         env:
           ANDROID_AVD_HOME: /home/runner/.config/.android/avd
         run: |
-          $ANDROID_HOME/emulator/emulator -list-avds
           $ANDROID_HOME/emulator/emulator -avd ci_avd -no-snapshot -noaudio -no-window -gpu swiftshader_indirect -no-accel &
           adb wait-for-device
-          adb shell input keyevent 82
+          until adb shell getprop sys.boot_completed | grep -q "1"; do
+            sleep 5
+          done
+          adb shell input keyevent 82 || true
 
       - name: Install Node.js
         uses: actions/setup-node@v4
