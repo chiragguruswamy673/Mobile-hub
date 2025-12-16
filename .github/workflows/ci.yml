@@ -23,13 +23,24 @@ jobs:
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Create and start emulator
+      - name: Install system image
+        run: sdkmanager "system-images;android-30;google_apis;x86_64"
+
+      - name: Create AVD
         run: |
-          sdkmanager "system-images;android-30;google_apis;x86_64"
-          echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
-          $ANDROID_HOME/emulator/emulator -avd test -no-snapshot -noaudio -no-window &
+          echo "no" | avdmanager create avd -n ci_avd -k "system-images;android-30;google_apis;x86_64" --device "pixel_6" --abi x86_64 --force
+          avdmanager list avd
+
+      - name: Start emulator
+        run: |
+          $ANDROID_HOME/emulator/emulator -avd ci_avd -no-snapshot -noaudio -no-window &
           adb wait-for-device
           adb shell input keyevent 82
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
       - name: Install Appium
         run: npm install -g appium
