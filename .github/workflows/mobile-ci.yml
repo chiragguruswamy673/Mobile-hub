@@ -47,7 +47,7 @@ jobs:
         env:
           ANDROID_AVD_HOME: /home/runner/.config/.android/avd
         run: |
-          $ANDROID_HOME/emulator/emulator -avd ci_avd -no-snapshot -noaudio -no-window -gpu swiftshader_indirect -no-accel &
+          $ANDROID_HOME/emulator/emulator -avd ci_avd -no-snapshot -noaudio -no-window -gpu swiftshader_indirect -no-accel > emulator.log 2>&1 &
           adb wait-for-device
           # Poll until boot is complete
           until adb shell getprop sys.boot_completed | grep -q "1"; do
@@ -67,9 +67,12 @@ jobs:
       - name: Start Appium server
         run: nohup appium --session-override > appium.log 2>&1 &
 
-      - name: Install demo app
-        run: adb install -r apps/demo.apk
-        # adjust path to your APK if different
+      - name: Build APK with Gradle
+        run: ./gradlew assembleDebug
+
+      - name: Install built app
+        run: adb install -r app/build/outputs/apk/debug/app-debug.apk
+        # adjust path if your module name is different
 
       - name: Run Appium tests
         run: mvn clean test
@@ -79,4 +82,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: emulator-logs
-          path: appium.log
+          path: |
+            emulator.log
+            appium.log
