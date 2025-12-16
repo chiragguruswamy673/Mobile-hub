@@ -1,5 +1,7 @@
 # 📱 Mobile Hub – Appium Test Suite
 
+[![Quick CI](https://github.com/chiragguruswamy673/Mobile-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/chiragguruswamy673/Mobile-hub/actions/workflows/ci.yml)
+
 A lightweight mobile automation framework built with **Appium** + **TestNG** to validate core flows (Login, Cart, Checkout) and resilience scenarios (Chaos triggers, Accessibility checks).  
 This project demonstrates how to set up, run, and scale mobile tests on Android emulators or real devices.
 
