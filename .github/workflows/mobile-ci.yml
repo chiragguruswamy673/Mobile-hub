@@ -50,9 +50,11 @@ jobs:
         run: |
           $ANDROID_HOME/emulator/emulator -avd ci_avd -no-snapshot -noaudio -no-window -gpu swiftshader_indirect -no-accel &
           adb wait-for-device
+          # Poll until boot is complete
           until adb shell getprop sys.boot_completed | grep -q "1"; do
             sleep 5
           done
+          sleep 30   # give system services time
           adb shell input keyevent 82 || true
 
       - name: Install Node.js
@@ -64,7 +66,18 @@ jobs:
         run: npm install -g appium
 
       - name: Start Appium server
-        run: appium --session-override &
+        run: nohup appium --session-override > appium.log 2>&1 &
+
+      - name: Install demo app
+        run: adb install -r apps/demo.apk
+        # adjust path to your APK if different
 
       - name: Run Appium tests
         run: mvn test
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: emulator-logs
+          path: appium.log
