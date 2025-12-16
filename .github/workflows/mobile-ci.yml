@@ -8,7 +8,7 @@ on:
 jobs:
   mobile-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
 
     steps:
       - name: Checkout repo
@@ -42,7 +42,6 @@ jobs:
             --device "pixel_6" \
             --abi x86_64 \
             --force
-          avdmanager list avd
 
       - name: Start emulator
         env:
@@ -54,7 +53,7 @@ jobs:
           until adb shell getprop sys.boot_completed | grep -q "1"; do
             sleep 5
           done
-          sleep 30   # give system services time
+          sleep 60   # buffer for system services
           adb shell input keyevent 82 || true
 
       - name: Install Node.js
@@ -73,7 +72,7 @@ jobs:
         # adjust path to your APK if different
 
       - name: Run Appium tests
-        run: mvn test
+        run: mvn clean test
 
       - name: Upload logs
         if: always()
