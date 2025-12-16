@@ -90,6 +90,10 @@ jobs:
       - name: Install Appium
         run: npm install -g appium
 
+      - name: Install UiAutomator2 driver
+        run: appium driver install uiautomator2
+
+
       - name: Start Appium server
         run: nohup appium --session-override > appium.log 2>&1 &
 
