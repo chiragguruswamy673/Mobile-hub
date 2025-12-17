@@ -23,6 +23,19 @@ jobs:
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Ensure gradlew is executable
+        run: chmod +x DemoApp/gradlew
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Build APK with Gradle
         run: cd DemoApp && ./gradlew assembleDebug
 
@@ -35,7 +48,7 @@ jobs:
   mobile-tests:
     runs-on: ubuntu-latest
     needs: build-demoapp
-    timeout-minutes: 35
+    timeout-minutes: 40
 
     steps:
       - name: Checkout repo
@@ -74,13 +87,14 @@ jobs:
         env:
           ANDROID_AVD_HOME: /home/runner/.config/.android/avd
         run: |
-          $ANDROID_HOME/emulator/emulator -avd ci_avd -no-snapshot -noaudio -no-window -gpu swiftshader_indirect -no-accel > emulator.log 2>&1 &
+          $ANDROID_HOME/emulator/emulator -avd ci_avd -no-snapshot -noaudio -no-window -gpu swiftshader_indirect -no-accel -no-boot-anim > emulator.log 2>&1 &
           adb wait-for-device
           until adb shell getprop sys.boot_completed | grep -q "1"; do
             sleep 5
           done
-          sleep 60
+          sleep 30
           adb shell input keyevent 82 || true
+          adb shell pm list packages
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -90,10 +104,11 @@ jobs:
       - name: Install Appium 3
         run: npm install -g appium@next
 
-
       - name: Install UiAutomator2 driver
         run: appium driver install uiautomator2
 
+      - name: Verify Appium drivers
+        run: appium driver list --installed
 
       - name: Start Appium server
         run: nohup appium --session-override > appium.log 2>&1 &
@@ -110,6 +125,10 @@ jobs:
       - name: Run Appium tests
         run: mvn clean test
 
+      - name: Capture logcat
+        if: always()
+        run: adb logcat -d > logcat.txt
+
       - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -118,3 +137,4 @@ jobs:
           path: |
             emulator.log
             appium.log
+            logcat.txt
