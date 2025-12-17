@@ -133,6 +133,8 @@ jobs:
             echo "Retrying install..."
             sleep 10
           done
+      - name: Warm up app
+        run: adb shell am start -n com.example.demoapp/.MainActivity || true
 
       - name: Run Appium tests
         run: mvn clean test

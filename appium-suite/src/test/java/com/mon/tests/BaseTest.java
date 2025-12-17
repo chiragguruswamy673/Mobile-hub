@@ -22,9 +22,9 @@ public class BaseTest {
                 .setAppPackage("com.example.demoapp")
                 .setAppActivity(".MainActivity")
                 // 👉 Add timeout fixes here:
-                .amend("uiautomator2ServerInstallTimeout", 60000)   // 60s
-                .amend("uiautomator2ServerLaunchTimeout", 60000)    // 60s
-                .amend("adbExecTimeout", 60000);                    // 60s
+                .amend("uiautomator2ServerInstallTimeout", 180000)   // 60s
+                .amend("uiautomator2ServerLaunchTimeout", 180000)    // 60s
+                .amend("adbExecTimeout", 180000);                    // 60s
 
         driver = new AndroidDriver(new URL("http://127.0.0.1:4723/"), options);
         System.out.println("Session started with ID: " + driver.getSessionId());
