@@ -119,8 +119,20 @@ jobs:
           name: demoapp-apk
           path: .
 
+      - name: Wait for package manager
+        run: |
+          until adb shell pm list packages; do
+            echo "Waiting for package manager..."
+            sleep 5
+          done
+
       - name: Install built app
-        run: adb install -r app-debug.apk
+        run: |
+          for i in 1 2 3; do
+            adb install -r app-debug.apk && break
+            echo "Retrying install..."
+            sleep 10
+          done
 
       - name: Run Appium tests
         run: mvn clean test
